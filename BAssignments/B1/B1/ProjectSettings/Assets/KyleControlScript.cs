@@ -1,0 +1,62 @@
+﻿using UnityEngine;
+using System.Collections;
+[RequireComponent(typeof(Animator))]
+public class KyleControlScript : MonoBehaviour {
+
+    public float animSpeed = 1.5f;
+    private Animator anim;
+    private AnimatorStateInfo currentBaseState;
+    private AnimatorStateInfo layer2CurrentState;
+
+    static int idleState = Animator.StringToHash("Base Layer.Idle");
+    static int fwdState = Animator.StringToHash("Base Layer.Fwd");
+    static int bkwdState = Animator.StringToHash("Base Layer.Bkwd");
+    static int jumpIdle = Animator.StringToHash("Base Layer.JumpIdle");
+    static int jumpBack = Animator.StringToHash("Base Layer.JumpBack");
+    static int jumpForward = Animator.StringToHash("Base Layer.JumpForward");
+    static int runState = Animator.StringToHash("Base Layer.Run");
+
+    void Start () {
+        anim = GetComponent<Animator>();
+    }
+
+   
+    void FixedUpdate()
+    {
+        float h = Input.GetAxis("Horizontal");
+        float v = Input.GetAxis("Vertical");
+        anim.SetFloat("Speed", v);
+        anim.SetFloat("Direction", h);
+        anim.speed = animSpeed;
+        currentBaseState = anim.GetCurrentAnimatorStateInfo(0);
+
+        //jump
+
+        if (currentBaseState.fullPathHash == idleState || currentBaseState.fullPathHash == fwdState || currentBaseState.fullPathHash == bkwdState)
+        {
+            if (Input.GetButtonDown("Jump"))
+            {
+                anim.SetBool("Jump", true);
+            }
+            if (Input.GetButtonDown("Fire3"))
+            {
+                anim.SetBool("Run", true);
+            }
+        }
+        else if (currentBaseState.fullPathHash == jumpIdle || currentBaseState.fullPathHash == jumpBack || currentBaseState.fullPathHash == jumpForward)
+        {
+            if (!anim.IsInTransition(0))
+            {
+                anim.SetBool("Jump", false);
+            }
+        }
+        else if (currentBaseState.fullPathHash == runState)
+        {
+            if (Input.GetButtonUp("Fire3"))
+            {
+                anim.SetBool("Run", false);
+            }
+        }
+
+    }
+}
