@@ -8,13 +8,19 @@ namespace CompleteProject
     public class Director : MonoBehaviour
     {
 
-        private bool agentClicked = false;
-        private bool obstacleClicked = false;
+        private bool agentClicked;
+        private bool obstacleClicked;
         private float speed = 2.0f;
         private GameObject obstacle;
 
         private ClickToMove script;
         private GameObject[] agents;
+
+        void start()
+        {
+            agentClicked = false;
+            obstacleClicked = false;
+        }
 
         // Update is called once per frame
         void Update()
