@@ -32,7 +32,7 @@ public class KyleControlScript : MonoBehaviour {
 
         //jump
 
-        if (currentBaseState.fullPathHash == idleState || currentBaseState.fullPathHash == fwdState || currentBaseState.fullPathHash == bkwdState)
+        if (currentBaseState.fullPathHash == idleState || currentBaseState.fullPathHash == fwdState || currentBaseState.fullPathHash == bkwdState || currentBaseState.fullPathHash == runState)
         {
             if (Input.GetButtonDown("Jump"))
             {
