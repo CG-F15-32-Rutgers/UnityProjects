@@ -1,7 +1,7 @@
 #Group Name
 ######Unity Projects - CG Fall 2015 @ Rutgers
 ######By: *[Leader], [Member1], [Member2], [Member3]*
-Check out our website: [Group Name Website](https://www.google.com "Google's Homepage!")
+Check out our website: [Here](https://rocky-brook-2490.herokuapp.com/ "Our Website")
 
 ![alt text](teamLogo.png)
 
