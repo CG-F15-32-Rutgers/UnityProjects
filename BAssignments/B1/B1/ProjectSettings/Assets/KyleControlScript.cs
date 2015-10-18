@@ -51,7 +51,7 @@ public class KyleControlScript : MonoBehaviour {
                 anim.SetBool("Jump", false);
             }
         }
-        if (currentBaseState.fullPathHash == runState)
+        if (currentBaseState.fullPathHash == runState || currentBaseState.fullPathHash == runJump)
         {
             if (Input.GetButtonUp("Fire3"))
             {
