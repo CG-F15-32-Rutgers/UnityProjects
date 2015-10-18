@@ -15,13 +15,14 @@ public class KyleControlScript : MonoBehaviour {
     static int jumpBack = Animator.StringToHash("Base Layer.JumpBack");
     static int jumpForward = Animator.StringToHash("Base Layer.JumpForward");
     static int runState = Animator.StringToHash("Base Layer.Run");
+    static int runJump = Animator.StringToHash("Base Layer.RunJump");
 
     void Start () {
         anim = GetComponent<Animator>();
     }
 
    
-    void FixedUpdate()
+    void Update()
     {
         float h = Input.GetAxis("Horizontal");
         float v = Input.GetAxis("Vertical");
@@ -43,14 +44,14 @@ public class KyleControlScript : MonoBehaviour {
                 anim.SetBool("Run", true);
             }
         }
-        else if (currentBaseState.fullPathHash == jumpIdle || currentBaseState.fullPathHash == jumpBack || currentBaseState.fullPathHash == jumpForward)
+        else if (currentBaseState.fullPathHash == jumpIdle || currentBaseState.fullPathHash == jumpBack || currentBaseState.fullPathHash == jumpForward || currentBaseState.fullPathHash == runJump)
         {
             if (!anim.IsInTransition(0))
             {
                 anim.SetBool("Jump", false);
             }
         }
-        else if (currentBaseState.fullPathHash == runState)
+        if (currentBaseState.fullPathHash == runState)
         {
             if (Input.GetButtonUp("Fire3"))
             {
