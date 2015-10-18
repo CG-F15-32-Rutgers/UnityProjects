@@ -1,7 +1,7 @@
 #Group Name
 ######Unity Projects - CG Fall 2015 @ Rutgers
-######By: *[Leader], [Member1], [Member2], [Member3]*
-Check out our website: [Group Name Website](https://www.google.com "Google's Homepage!")
+######By: *Mike Dwyer, Le Liu, Arlind Hoxha, Mike 2*
+Check out our website: [CG-F15-32-Rutgers](https://github.com/CG-F15-32-Rutgers "CG-F15-32-Rutgers")
 
 ![alt text](teamLogo.png)
 
