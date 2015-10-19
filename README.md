@@ -1,12 +1,10 @@
 #Group Name
 ######Unity Projects - CG Fall 2015 @ Rutgers
-<<<<<<< HEAD
 ######By: *Mike Dwyer, Le Liu, Arlind Hoxha, Mike 2*
 Check out our website: [CG-F15-32-Rutgers](https://github.com/CG-F15-32-Rutgers "CG-F15-32-Rutgers")
 =======
 ######By: *Michael Dwyer, Le Liu, Arlind Hoxha, Michael Coyle*
 Check out our website: [Here](https://rocky-brook-2490.herokuapp.com/ "Our Website")
->>>>>>> refs/remotes/origin/master
 
 ![alt text](teamLogo.png)
 
