@@ -5,7 +5,7 @@ namespace CompleteProject
 {
 
 
-    public class Director : MonoBehaviour
+    public class doubleclickdirector : MonoBehaviour
     {
 
         private bool agentClicked;
@@ -13,7 +13,7 @@ namespace CompleteProject
         private float speed = 2.0f;
         private GameObject obstacle;
 
-        private ClickToMove script;
+        private ClickToMoveKyle script;
         private GameObject[] agents;
 
         void start()
@@ -36,7 +36,7 @@ namespace CompleteProject
                     {
                         agentClicked = true;
                         obstacleClicked = false;
-                        script = GameObject.Find(hit.collider.name).GetComponent<ClickToMove>();
+                        script = GameObject.Find(hit.collider.name).GetComponent<ClickToMoveKyle>();
                         script.selected = true;
                     }
                     else if (hit.collider.CompareTag("Obstacle"))
@@ -49,20 +49,18 @@ namespace CompleteProject
                         obstacleClicked = false;
                         if (agentClicked)
                         {
-                            agentClicked = false;
-                            agents = GameObject.FindGameObjectsWithTag("Agent");
-                            foreach (GameObject go in agents)
-                            {
-                                script = go.GetComponent<ClickToMove>();
-                                if(script.selected == true)
+                                agentClicked = false;
+                                agents = GameObject.FindGameObjectsWithTag("Agent");
+                                foreach (GameObject go in agents)
                                 {
-                                    script.selected = false;
-                                    script.moveAgent(hit, true);
+                                    script = go.GetComponent<ClickToMoveKyle>();
+                                    if (script.selected == true)
+                                    {
+                                        script.selected = false;
+                                        script.moveAgent(hit, true);
+                                    }
                                 }
-
-                            }
                         }
-
                     }
                 }
             }
