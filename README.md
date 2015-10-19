@@ -18,7 +18,6 @@ Check out our website: [Here](https://rocky-brook-2490.herokuapp.com/ "Our Websi
     first before character can turn.
     Hold down left-shift to run.
     Press space to jump.
-
    Navigation and Animation:
     Controls are the same as for navigation. Characters cross OffMeshLinks before initiating
     jump animation. Character can't run by double-clicking.
