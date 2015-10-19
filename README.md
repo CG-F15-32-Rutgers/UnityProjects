@@ -13,11 +13,13 @@ Check out our website: [Here](https://rocky-brook-2490.herokuapp.com/ "Our Websi
     Red Boxes are NavMesh obstacles. Select them with left mouse click and once selected
     move with arrow keys.
     Select capsules with left-mouse click. Multiple capsules can be selected at a time.
+
    Animation:
     Move character with WASD. Character doesn't turn while idle. Must be moving forward
     first before character can turn.
     Hold down left-shift to run.
     Press space to jump.
+    
    Navigation and Animation:
     Controls are the same as for navigation. Characters cross OffMeshLinks before initiating
     jump animation. Character can't run by double-clicking.
