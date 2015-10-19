@@ -23,7 +23,8 @@ Check out our website: [Here](https://rocky-brook-2490.herokuapp.com/ "Our Websi
    Navigation and Animation:
     Controls are the same as for navigation. Characters cross OffMeshLinks before initiating
     jump animation. Character can't run by double-clicking.
-3. Description
+    
+3. This project is meant as an introduction to Unity's navigation and animation system. We leverage these systems in order to build a simple crowd simulator, where you control humanoid robots in a complex environment. You can even move obstacles in and out of the robots' way and their path will be updated accordingly.
 
 ###B2: Inverse Kinematics
 1. I am a hard project!
