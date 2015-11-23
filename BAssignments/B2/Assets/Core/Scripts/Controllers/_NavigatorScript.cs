@@ -7,6 +7,8 @@ public class _NavigatorScript : MonoBehaviour
 	private NavMeshAgent agent;
 	private Animator animator;
 	private float angleDiff;
+    private bool rage;
+    private float timeDiff;
 
 	[HideInInspector]
 	public Quaternion desiredOrientation{ get; set; }
@@ -35,7 +37,11 @@ public class _NavigatorScript : MonoBehaviour
             //TODO Resetting path here, otherwise e.g. stepback animation not working properly - CS 03.09.2014
             //Is there a better solution?
             agent.ResetPath();
-			locomotion.Do(0, angleDiff);
+            if (rage == false)
+            {
+                locomotion.Do(0, angleDiff);
+            }
+			
 		}
 		else
 		{
@@ -44,8 +50,11 @@ public class _NavigatorScript : MonoBehaviour
 			Vector3 velocity = Quaternion.Inverse(transform.rotation) * agent.desiredVelocity;
 			
 			float angle = Mathf.Atan2(velocity.x, velocity.z) * 180.0f / 3.14159f;
+			if (rage == false)
+            {
+                locomotion.Do(speed, angle);
+            }
 			
-			locomotion.Do(speed, angle);
 		}
 	}
 
@@ -77,18 +86,27 @@ public class _NavigatorScript : MonoBehaviour
 	void Update () 
 	{
 		SetupAgentLocomotion();
+        if (rage == true)
+        {
+            
+            if (Time.time - timeDiff > 1.5)
+            {
+                rage = false;
+                
+                animator.SetBool("F_FireBreath", false);
+            }
+        }
+ 
 	}
 
     void OnCollisionEnter(Collision col)
     {
         if (col.gameObject.tag == "Obstacle")
         {
-            agent.speed = 0;
-            agent.velocity = new Vector3(0, 0, 0);
             locomotion.Do(0, 0);
-            agent.ResetPath();
-            animator.SetFloat("speed", 0);
             animator.SetBool("F_FireBreath", true);
+            timeDiff = Time.time;
+            rage = true;
         }
     }
 
