@@ -78,5 +78,15 @@ public class _NavigatorScript : MonoBehaviour
 	{
 		SetupAgentLocomotion();
 	}
-	
-}
+
+    void OnCollisionEnter(Collision col)
+    {
+        if (col.gameObject.tag == "Obstacle")
+        {
+            print("Test");
+            animator.SetFloat("speed", 0);
+            animator.SetBool("F_FireBreath", true);
+        }
+    }
+
+    }
