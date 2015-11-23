@@ -1,12 +1,18 @@
 using UnityEngine;
 using TreeSharpPlus;
 using System.Collections;
+using System;
 
 public class _NavigatorScript : MonoBehaviour
 {	
 	private NavMeshAgent agent;
 	private Animator animator;
+    private GameObject temp;
 	private float angleDiff;
+    private bool pickup = false;
+    private bool delCapsule = false;
+    private float gameTime;
+
 
 	[HideInInspector]
 	public Quaternion desiredOrientation{ get; set; }
@@ -15,16 +21,22 @@ public class _NavigatorScript : MonoBehaviour
 	protected LocomotionController locomotion;
 
 
-	void Start() { this.Initialize(); }
+	void Start()
+    {
+        this.Initialize();
+        temp = GameObject.Find("Pickup object");
+    }
 
 	public void Initialize() 
 	{
 		agent = this.GetComponent<NavMeshAgent> ();
 		animator = this.GetComponent<Animator> ();
         desiredOrientation = transform.rotation;
+        
 
-		/*put together with locomotion*/
-		locomotion = new LocomotionController(animator);
+
+        /*put together with locomotion*/
+        locomotion = new LocomotionController(animator);
 
 	}
 
@@ -77,6 +89,23 @@ public class _NavigatorScript : MonoBehaviour
 	void Update () 
 	{
 		SetupAgentLocomotion();
+        if (pickup == false && agent.name == "Harry")
+        {
+            animator.SetBool("B_PickupRight", true);
+            pickup = true;
+            gameTime = Time.time;        
+        }
+        float timeDiff = Time.time - gameTime;
+        if (delCapsule == false && pickup == true && agent.name == "Harry" && timeDiff > 0.75)
+        {
+            Vector3 pos = GameObject.Find("Harry/Harry/UMA_Male_Rig/Global/Position/Hips/LowerBack/Spine/Spine1/RightShoulder/RightArm/RightForeArm/RightHand").transform.position;
+            temp.transform.position = pos;
+            if (timeDiff > 1.25)
+            {
+                delCapsule = true;
+                temp.SetActive(false);
+            }
+        }
 	}
 	
 }
