@@ -83,7 +83,10 @@ public class _NavigatorScript : MonoBehaviour
     {
         if (col.gameObject.tag == "Obstacle")
         {
-            print("Test");
+            agent.speed = 0;
+            agent.velocity = new Vector3(0, 0, 0);
+            locomotion.Do(0, 0);
+            agent.ResetPath();
             animator.SetFloat("speed", 0);
             animator.SetBool("F_FireBreath", true);
         }
