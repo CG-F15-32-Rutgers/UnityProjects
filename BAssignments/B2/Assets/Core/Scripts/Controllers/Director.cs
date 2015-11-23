@@ -42,12 +42,19 @@ namespace CompleteProject
                     //else if
                     if (hit.collider.CompareTag("Obstacle"))
                     {
+                        if(obstacle != null)
+                        {
+                            obstacle.GetComponent<Renderer>().material.color = Color.black;
+                        }
+  
                         obstacleClicked = true;
                         obstacle = GameObject.Find(hit.collider.name);
+                        obstacle.GetComponent<Renderer>().material.color = Color.red;
                     }
                     else
                     {
                         obstacleClicked = false;
+                        obstacle.GetComponent<Renderer>().material.color = Color.black;
                         /*if (agentClicked)
                         {
                             agentClicked = false;
