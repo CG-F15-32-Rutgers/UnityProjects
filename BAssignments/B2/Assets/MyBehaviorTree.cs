@@ -1,14 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
 using TreeSharpPlus;
+using RootMotion.FinalIK;
 
 public class MyBehaviorTree : MonoBehaviour
 {
-	public Transform wander1;
-	public Transform wander2;
-	public Transform wander3;
-	public GameObject participant;
-	public GameObject participant2;
+	public Transform[] locations;
+	public GameObject[] participants;
 
 	private BehaviorAgent behaviorAgent;
 	// Use this for initialization
@@ -25,45 +23,99 @@ public class MyBehaviorTree : MonoBehaviour
 	
 	}
 
-	protected Node GunPoint()
+	protected Node Wave(int player1Num, int player2Num)
 	{
 		return
 			new DecoratorPrintResult(
-				new SequenceParallel( 
-			             participant.GetComponent<BehaviorMecanim>().ST_PlayGesture("PistolAim", AnimationLayer.Hand, 6000),
-			             new Sequence(						 
-	                     participant2.GetComponent<BehaviorMecanim>().ST_PlayGesture("Shock", AnimationLayer.Hand, 1000),
-						 participant2.GetComponent<BehaviorMecanim>().ST_PlayGesture("HandsUp", AnimationLayer.Hand, 5000))));
+				new Sequence( 
+			             participants[player1Num].GetComponent<BehaviorMecanim>().ST_PlayGesture("Wave", AnimationLayer.Hand, 1000),
+			             participants[player2Num].GetComponent<BehaviorMecanim>().ST_PlayGesture("Wave", AnimationLayer.Hand, 1000),
+			             participants[player1Num].GetComponent<BehaviorMecanim>().ST_PlayGesture("CallOver", AnimationLayer.Hand, 1000)));
 	}
 
-	
-	public Node ST_ApproachAndOrient()
+	protected Node Converse(int player1Num, int player2Num)
 	{
-		Val <Vector3> p1pos = Val.V(() => participant.gameObject.transform.position);
-		Val<Vector3> p2pos = Val.V(() => participant2.gameObject.transform.position);
+		return
+			new DecoratorPrintResult(
+				new Sequence( 
+			             participants[player1Num].GetComponent<BehaviorMecanim>().ST_PlayGesture("ACKNOWLEDGE", AnimationLayer.Face, 1000),
+			             participants[player2Num].GetComponent<BehaviorMecanim>().ST_PlayGesture("Think", AnimationLayer.Face, 1000),
+			             participants[player1Num].GetComponent<BehaviorMecanim>().ST_PlayGesture("Think", AnimationLayer.Face, 1000),
+			             participants[player2Num].GetComponent<BehaviorMecanim>().ST_PlayGesture("HeadNod", AnimationLayer.Face, 1000)));
+	}
+
+	public Node ST_Orient(int player1Num ,int player2Num)
+	{
+		Val <Vector3> p1pos = Val.V(() => participants[player1Num].gameObject.transform.position);
+		Val<Vector3> p2pos = Val.V(() => participants[player2Num].gameObject.transform.position);
 		return new Sequence(
 			new SequenceParallel(
-			participant.GetComponent<BehaviorMecanim>().Node_OrientTowards(p2pos),
-			participant2.GetComponent<BehaviorMecanim>().Node_OrientTowards(p1pos)));
+			participants[player1Num].GetComponent<BehaviorMecanim>().Node_OrientTowards(p2pos),
+			participants[player2Num].GetComponent<BehaviorMecanim>().Node_OrientTowards(p1pos)));
 	}
 
+	public Node ST_ApproachAndOrient(Transform location1, int player1Num , Transform location2, int player2Num)
+	{
+		Val <Vector3> p1pos = Val.V(() => participants[player1Num].gameObject.transform.position);
+		Val<Vector3> p2pos = Val.V(() => participants[player2Num].gameObject.transform.position);
+		Val<Vector3> position1 = Val.V(() => location1.position);
+		Val<Vector3> position2 = Val.V(() => location2.position);
+		return new Sequence(
+			new SequenceParallel(
+			participants[player1Num].GetComponent<BehaviorMecanim>().Node_GoTo(position1),
+			participants[player2Num].GetComponent<BehaviorMecanim>().Node_GoTo(position2)),
+			new SequenceParallel(
+			participants[player1Num].GetComponent<BehaviorMecanim>().Node_OrientTowards(p2pos),
+			participants[player2Num].GetComponent<BehaviorMecanim>().Node_OrientTowards(p1pos)));
+	}
 
-
-	protected Node ST_ApproachAndWait(Transform target)
+	protected Node ST_ApproachAndWait(int playerNum, Transform target)
 	{
 		Val<Vector3> position = Val.V (() => target.position);
-		return new Sequence( participant.GetComponent<BehaviorMecanim>().Node_GoTo(position), new LeafWait(1000));
+		return new Sequence( participants[playerNum].GetComponent<BehaviorMecanim>().Node_GoTo(position), new LeafWait(1000));
 	}
 
 	protected Node BuildTreeRoot()
 	{
+		int[] playerIndex = new int[participants.Length];
+		//Val<Vector3>[] playerPos = new Val<Vector3>[numberOfParticipants.Length];
+		//reshuffle(numberOfParticipants);
+		for (int i = 0; i < playerIndex.Length; i++)
+		{
+			playerIndex[i] = i;
+			
+		}
+
+		int[] moveto = new int[participants.Length];
+		print (participants.Length);
+		int randomPos = Random.Range(0, participants.Length);
+		print (randomPos);
+		if (randomPos % 2 != 0) {
+			randomPos--;
+		}
+		for (int i = 0; i < playerIndex.Length; i++)
+		{
+			moveto[i] = randomPos;
+			print(moveto[i]);
+			randomPos++;
+		}
+		
 		return
 			new DecoratorLoop (
-				new SequenceParallel (
+				new SequenceParallel(
 					new Sequence (
-					this.ST_ApproachAndOrient(),
-					this.GunPoint ())
-		)
-		);
+					this.ST_Orient( playerIndex [0], playerIndex [1]),
+					this.Wave( playerIndex [0], playerIndex [1]),
+					this.ST_ApproachAndOrient (locations [moveto[0]], playerIndex [0], locations [moveto[1]], playerIndex [1]),
+					this.Converse (playerIndex[0], playerIndex[1])
+					),
+					new Sequence (
+					this.ST_Orient( playerIndex [2], playerIndex [3]),
+					this.Wave( playerIndex [2], playerIndex [3]),
+					this.ST_ApproachAndOrient (locations [moveto[2]], playerIndex [2], locations [moveto[3]], playerIndex [3]),
+					this.Converse (playerIndex[2], playerIndex[3])
+					)
+				)
+				);
 	}
 }
