@@ -72,7 +72,7 @@ public class MyBehaviorTree : MonoBehaviour
 	protected Node ST_ApproachAndWait(int playerNum, Transform target)
 	{
 		Val<Vector3> position = Val.V (() => target.position);
-		return new Sequence( participants[playerNum].GetComponent<BehaviorMecanim>().Node_GoTo(position), new LeafWait(1000));
+		return new Sequence( participants[playerNum].GetComponent<BehaviorMecanim>().Node_GoTo(position), new LeafWait(1));
 	}
     protected Node ST_Approach(int playerNum, Transform target)
     {
@@ -112,32 +112,35 @@ public class MyBehaviorTree : MonoBehaviour
             wanderto[i] = randomPos + 8;
             randomPos++;
         }*/
-		
-		return
-			new DecoratorLoop (
+
+        return
+            new DecoratorLoop(
                 new Sequence(
-				    new SequenceParallel(
-					    new Sequence (
-					    this.ST_Orient( playerIndex [0], playerIndex [1]),
-					    this.Wave( playerIndex [0], playerIndex [1]),
-					    this.ST_ApproachAndOrient (locations [moveto[0]], playerIndex [0], locations [moveto[1]], playerIndex [1]),
-					    new DecoratorLoop( 3, this.Converse (playerIndex[0], playerIndex[1]))
-					    ),
-					    new Sequence (
-					    this.ST_Orient( playerIndex [2], playerIndex [3]),
-					    this.Wave( playerIndex [2], playerIndex [3]),
-					    this.ST_ApproachAndOrient (locations [moveto[2]], playerIndex [2], locations [moveto[3]], playerIndex [3]),
-					    new DecoratorLoop(6, this.Converse (playerIndex[2], playerIndex[3]))
-					    )
-				    ),
-                     new SequenceParallel(
-                        new DecoratorLoop(3, this.ST_Approach(playerIndex[0], locations[Random.Range(8, 19)])),
-                        new DecoratorLoop(3, this.ST_Approach(playerIndex[1], locations[Random.Range(8, 19)])),
-                        new DecoratorLoop(3, this.ST_Approach(playerIndex[2], locations[Random.Range(8, 19)])),
-                        new DecoratorLoop(3, this.ST_Approach(playerIndex[3], locations[Random.Range(8, 19)]))
+                    new SequenceParallel(
+                        new Sequence(
+                        this.ST_Orient(playerIndex[0], playerIndex[1]),
+                        this.Wave(playerIndex[0], playerIndex[1]),
+                        this.ST_ApproachAndOrient(locations[moveto[0]], playerIndex[0], locations[moveto[1]], playerIndex[1]),
+                        new DecoratorLoop(1, this.Converse(playerIndex[0], playerIndex[1])),
+                        this.Wave(playerIndex[0], playerIndex[1])
+                        ),
+                        new Sequence(
+                        this.ST_Orient(playerIndex[2], playerIndex[3]),
+                        this.Wave(playerIndex[2], playerIndex[3]),
+                        this.ST_ApproachAndOrient(locations[moveto[2]], playerIndex[2], locations[moveto[3]], playerIndex[3]),
+                        new DecoratorLoop(1, this.Converse(playerIndex[2], playerIndex[3])),
+                        this.Wave(playerIndex[2], playerIndex[3])
+                        )
+                    ),
+                     new DecoratorLoop(new SequenceParallel(
+                        this.ST_ApproachAndWait(playerIndex[0], locations[Random.Range(8, 10)]),
+                        this.ST_ApproachAndWait(playerIndex[1], locations[Random.Range(11, 13)]),
+                        this.ST_ApproachAndWait(playerIndex[2], locations[Random.Range(14, 16)]),
+                        this.ST_ApproachAndWait(playerIndex[3], locations[Random.Range(17, 19)]))
 
                         //new ForEach<GameObject> (new Sequence(participants[].GetComponent<BehaviorMecanim>().Node_GoTo(Val.V(()=>locations[Random.Range(8,19)].transform.position), new LeafWait(1000))/*(locations[Random.Range(8, 19)]*/, participants)
                         )
+
                 )
 			);
 	}
