@@ -114,8 +114,8 @@ public class MyBehaviorTree : MonoBehaviour
         }*/
 
         return
-            new DecoratorLoop(
-                new Sequence(
+            new DecoratorLoop( 
+                new DecoratorForceStatus( RunStatus.Success, new Sequence(
                     new SequenceParallel(
                         new Sequence(
                         this.ST_Orient(playerIndex[0], playerIndex[1]),
@@ -132,16 +132,16 @@ public class MyBehaviorTree : MonoBehaviour
                         this.Wave(playerIndex[2], playerIndex[3])
                         )
                     ),
-                     new DecoratorLoop(new SequenceParallel(
+                     new DecoratorForceStatus(RunStatus.Success, new DecoratorLoop( new SequenceParallel(
                         this.ST_ApproachAndWait(playerIndex[0], locations[Random.Range(8, 10)]),
                         this.ST_ApproachAndWait(playerIndex[1], locations[Random.Range(11, 13)]),
                         this.ST_ApproachAndWait(playerIndex[2], locations[Random.Range(14, 16)]),
-                        this.ST_ApproachAndWait(playerIndex[3], locations[Random.Range(17, 19)]))
+                        this.ST_ApproachAndWait(playerIndex[3], locations[Random.Range(17, 19)])))
 
                         //new ForEach<GameObject> (new Sequence(participants[].GetComponent<BehaviorMecanim>().Node_GoTo(Val.V(()=>locations[Random.Range(8,19)].transform.position), new LeafWait(1000))/*(locations[Random.Range(8, 19)]*/, participants)
                         )
 
                 )
-			);
+			));
 	}
 }
