@@ -40,7 +40,8 @@ public class ZombieAI : MonoBehaviour {
 	void attack ()
 	{
 		Debug.Log("moving toward person");
-		//theRigidBody.AddForce (transform.forward * moveSpeed);
-		transform.Translate(Vector3.forward * moveSpeed * Time.deltaTime);
+        //theRigidBody.AddForce (transform.forward * moveSpeed);
+        this.GetComponent<NavMeshAgent>().destination = target.position;
+		//transform.Translate(Vector3.forward * moveSpeed * Time.deltaTime);
 	}
 }
