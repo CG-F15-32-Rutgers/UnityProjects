@@ -114,7 +114,6 @@ public class MyBehaviorTree : MonoBehaviour
         }*/
 
         return
-            new DecoratorLoop( 
                 new DecoratorForceStatus( RunStatus.Success, new Sequence(
                     new SequenceParallel(
                         new Sequence(
@@ -142,6 +141,6 @@ public class MyBehaviorTree : MonoBehaviour
                         )
 
                 )
-			));
+			);
 	}
 }

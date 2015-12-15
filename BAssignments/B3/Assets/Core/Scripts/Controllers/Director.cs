@@ -8,18 +8,26 @@ namespace CompleteProject
     public class Director : MonoBehaviour
     {
 
-       // private bool agentClicked;
+       private bool CharacterClicked;
         private bool obstacleClicked;
         private float speed = 2.0f;
         private GameObject obstacle;
+        private GameObject MainCamera;
+        private GameObject Character;
 
-        //private ClickToMove script;
+        private PlayerCamera script;
         //private GameObject[] agents;
 
         void start()
         {
-            //agentClicked = false;
+            CharacterClicked = false;
             obstacleClicked = false;
+            //MainCamera = GameObject.FindGameObjectWithTag("MainCamera");
+        }
+
+        void Awake()
+        {
+            MainCamera = GameObject.FindGameObjectWithTag("MainCamera");
         }
 
         // Update is called once per frame
@@ -32,15 +40,19 @@ namespace CompleteProject
             {
                 if (Physics.Raycast(ray, out hit, 100))
                 {
-                    /*if (hit.collider.CompareTag("Agent"))
+                    if (hit.collider.CompareTag("Character"))
                     {
-                        agentClicked = true;
+                        CharacterClicked = true;
                         obstacleClicked = false;
-                        script = GameObject.Find(hit.collider.name).GetComponent<ClickToMove>();
-                        script.selected = true;
-                    }*/
+                        Character = GameObject.Find(hit.collider.name);
+                        MainCamera.GetComponent<CameraController>().enabled = false;
+                        MainCamera.GetComponent<PlayerCamera>().enabled = true;
+                        MainCamera.GetComponent<PlayerCamera>().target = Character;
+                        MainCamera.GetComponent<PlayerCamera>().offset = new Vector3 (0, -3, 6);
+
+                    }
                     //else if
-                    if (hit.collider.CompareTag("Obstacle"))
+                    /*if (hit.collider.CompareTag("Obstacle"))
                     {
                         if(obstacle != null)
                         {
@@ -71,7 +83,7 @@ namespace CompleteProject
                             }
                         }*/
 
-                    }
+                    //}
                 }
             }
 
@@ -93,8 +105,16 @@ namespace CompleteProject
                 {
                     obstacle.transform.position += Vector3.back * speed * Time.deltaTime;
                 }
-            }
+           }
 
+            if (Input.GetKey(KeyCode.Escape))
+            {
+                CharacterClicked = false;
+
+                MainCamera.GetComponent<PlayerCamera>().enabled = false;
+                MainCamera.GetComponent<CameraController>().enabled = true;
+            }
         }
+    
     }
 }

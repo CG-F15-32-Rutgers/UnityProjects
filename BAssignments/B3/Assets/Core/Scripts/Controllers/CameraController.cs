@@ -14,8 +14,8 @@ public class CameraController : MonoBehaviour
 
     float rotationY = 0.0f;
     float rotationX = 0.0f;
-    private float speed = 2.0f;
-    private float zoomSpeed = 2.0f;
+    private float speed = 5.0f;
+    private float zoomSpeed = 5.0f;
     // Use this for initialization
     void Start()
     {
@@ -29,19 +29,19 @@ public class CameraController : MonoBehaviour
 
         if (Input.GetKey(KeyCode.D))
         {
-            transform.position += Vector3.right * speed * Time.deltaTime;
+            transform.Translate( Vector3.right * speed * Time.deltaTime);
         }
         if (Input.GetKey(KeyCode.A))
         {
-            transform.position += Vector3.left * speed * Time.deltaTime;
+            transform.Translate( Vector3.left * speed * Time.deltaTime);
         }
         if (Input.GetKey(KeyCode.W))
         {
-            transform.position += Vector3.forward * speed * Time.deltaTime;
+            transform.Translate(Vector3.forward * speed * Time.deltaTime);
         }
         if (Input.GetKey(KeyCode.S))
         {
-            transform.position += Vector3.back * speed * Time.deltaTime;
+            transform.Translate( Vector3.back * speed * Time.deltaTime);
         }
 
         if (Input.GetMouseButton(1))
