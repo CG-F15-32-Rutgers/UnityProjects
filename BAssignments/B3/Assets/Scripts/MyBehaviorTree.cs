@@ -84,7 +84,7 @@ public class MyBehaviorTree : MonoBehaviour
 
     protected Node BuildTreeRoot()
 	{
-
+        //this.GetComponent<NightTime>().changeTime();
         return
             new DecoratorLoop(
                 new SequenceShuffle(
