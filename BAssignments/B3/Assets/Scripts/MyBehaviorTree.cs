@@ -18,6 +18,8 @@ public class MyBehaviorTree : MonoBehaviour
     public Transform[] accusedPoints;
     public Transform[] roaming;
 
+    private int vote_count;
+
     private BehaviorAgent behaviorAgent;
 	// Use this for initialization
 	void Start ()
@@ -54,6 +56,15 @@ public class MyBehaviorTree : MonoBehaviour
                          char2.GetComponent<BehaviorMecanim>().ST_PlayGesture("HeadNod", AnimationLayer.Face, 1000)));
 	}
 
+    protected Node speech(GameObject char1)
+    {
+        return new Sequence(
+                         char1.GetComponent<BehaviorMecanim>().ST_PlayGesture("ACKNOWLEDGE", AnimationLayer.Face, 1000),
+                         char1.GetComponent<BehaviorMecanim>().ST_PlayGesture("Think", AnimationLayer.Face, 1000),
+                         char1.GetComponent<BehaviorMecanim>().ST_PlayGesture("HeadNod", AnimationLayer.Face, 1000)
+                         );
+    }
+
 	protected Node ST_Orient(GameObject char1 , GameObject char2)
 	{
 		Val <Vector3> p1pos = Val.V(() => char1.transform.position);
@@ -83,7 +94,7 @@ public class MyBehaviorTree : MonoBehaviour
         Val<Vector3> position1 = Val.V(() => extras[7].transform.position);
         return new SequenceParallel(
             new Sequence(extras[9].GetComponent<BehaviorMecanim>().Node_OrientTowards(position1), new LeafWait(1000)),
-            ST_Orient(mayor, extras[16]),
+            ST_Orient(mayor, extras[0]),
             ST_Orient(extras[0], extras[1]),
             ST_Orient(extras[3], extras[4]),
             ST_Orient(extras[5], extras[6]),
@@ -96,40 +107,116 @@ public class MyBehaviorTree : MonoBehaviour
     protected Node pre_trial_converse()
     {
         return new SequenceParallel(
-            new DecoratorLoop(2, Converse(mayor, extras[16])),
+            new DecoratorLoop(2, Converse(mayor, extras[15])),
             new DecoratorLoop(2, Converse(extras[0], extras[1])),
             new DecoratorLoop(2, Converse(extras[3], extras[4])),
             new DecoratorLoop(2, Converse(extras[5], extras[6])),
             new DecoratorLoop(2, Converse(extras[7], extras[8])),
             new DecoratorLoop(2, Converse(extras[10], extras[11])),
             new DecoratorLoop(2, Converse(extras[12], extras[13])),
-            new Sequence(ST_ApproachAndWait(extras[2], roaming[1]))
+            new Sequence(ST_ApproachAndWait(extras[15], roaming[1]))
             );
     }
 
     protected Node goto_trial()
     {
-        return new SequenceParallel(
+        return new DecoratorForceStatus(RunStatus.Success, new SequenceParallel(
             ST_ApproachAndOrient(mayor, mayorPoints[0], audienceSpots[2]),
             ST_ApproachAndOrient(extras[0], audienceSpots[0], mayorPoints[0]),
             ST_ApproachAndOrient(extras[1], audienceSpots[1], mayorPoints[0]),
             ST_ApproachAndOrient(extras[2], audienceSpots[2], mayorPoints[0]),
-            ST_ApproachAndOrient(extras[3], audienceSpots[3], mayorPoints[0]),
-            ST_ApproachAndOrient(extras[4], audienceSpots[4], mayorPoints[0]),
-            ST_ApproachAndOrient(extras[5], audienceSpots[5], mayorPoints[0]),
+            ST_ApproachAndOrient(extras[3], audienceSpots[18], mayorPoints[0]),
+            ST_ApproachAndOrient(extras[4], audienceSpots[19], mayorPoints[0]),
+            ST_ApproachAndOrient(extras[5], audienceSpots[3], mayorPoints[0]),
             ST_ApproachAndOrient(extras[6], audienceSpots[6], mayorPoints[0]),
             ST_ApproachAndOrient(extras[7], audienceSpots[7], mayorPoints[0]),
-            ST_ApproachAndOrient(extras[8], audienceSpots[8], mayorPoints[0]),
-            ST_ApproachAndOrient(extras[9], audienceSpots[9], mayorPoints[0]),
+            ST_ApproachAndOrient(extras[8], audienceSpots[16], mayorPoints[0]),
+            ST_ApproachAndOrient(extras[9], audienceSpots[17], mayorPoints[0]),
             ST_ApproachAndOrient(extras[10], audienceSpots[10], mayorPoints[0]),
             ST_ApproachAndOrient(extras[11], audienceSpots[11], mayorPoints[0]),
             ST_ApproachAndOrient(extras[12], audienceSpots[12], mayorPoints[0]),
             ST_ApproachAndOrient(extras[13], audienceSpots[13], mayorPoints[0]),
             ST_ApproachAndOrient(extras[14], audienceSpots[14], mayorPoints[0]),
             ST_ApproachAndOrient(extras[15], audienceSpots[15], mayorPoints[0]),
-            ST_ApproachAndOrient(extras[16], audienceSpots[16], mayorPoints[0]),
             ST_ApproachAndOrient(accused, accusedPoints[0], audienceSpots[2]),
             ST_ApproachAndOrient(executioner, executionerPoints[0], accusedPoints[0])
+            ));
+    }
+
+    protected Node trial()
+    {
+        return new Sequence(
+            new DecoratorLoop(5, speech(mayor))
+            );
+    }
+    
+    protected Node accused_plee()
+    {
+        return new Sequence(
+            new DecoratorLoop(2, speech(accused))
+            );
+    }
+
+    protected Node voting()
+    {
+        return new SequenceParallel(
+            vote(extras[0]),
+            vote(extras[1]),
+            vote(extras[2]),
+            vote(extras[3]),
+            vote(extras[4]),
+            vote(extras[5]),
+            vote(extras[6]),
+            vote(extras[7]),
+            vote(extras[8]),
+            vote(extras[9]),
+            vote(extras[10]),
+            vote(extras[11]),
+            vote(extras[12]),
+            vote(extras[13]),
+            vote(extras[14]),
+            vote(extras[15])
+            );
+    }
+
+    protected Node vote(GameObject char1)
+    {
+        return new SelectorShuffle(
+             vote_true(char1),
+              char1.GetComponent<BehaviorMecanim>().ST_PlayGesture("HeadShake", AnimationLayer.Face, 2000)
+            );
+    }
+
+    protected Node vote_true(GameObject char1)
+    {
+        vote_count += 1;
+        return new Sequence(char1.GetComponent<BehaviorMecanim>().ST_PlayGesture("Wave", AnimationLayer.Hand, 2000));
+    }
+
+    protected Node decide_execution()
+    {
+        if (vote_count > 12)
+        {
+            return new Sequence(commit_execution());
+        }
+        else
+        {
+            return new Sequence(freedom());
+        }
+
+    }
+
+    protected Node commit_execution()
+    {
+        return new Sequence(
+            ST_ApproachAndOrient(executioner, executionerPoints[1], accusedPoints[0])
+            );
+    }
+
+    protected Node freedom()
+    {
+        return new Sequence(
+            ST_ApproachAndWait(accused, accusedPoints[1])
             );
     }
 
@@ -146,9 +233,10 @@ public class MyBehaviorTree : MonoBehaviour
 
     protected Node BuildTreeRoot()
 	{
+        vote_count = 0;
         //this.GetComponent<NightTime>().changeTime();
         return new DecoratorLoop(
-            new Sequence(pre_trial(), pre_trial_converse(), goto_trial())
+            new Sequence(pre_trial(), pre_trial_converse(), goto_trial(), trial(), accused_plee(), voting(), decide_execution())
                     
             );
 	}
