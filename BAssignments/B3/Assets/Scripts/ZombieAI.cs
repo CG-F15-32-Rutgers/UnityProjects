@@ -11,22 +11,35 @@ public class ZombieAI : MonoBehaviour {
 	public float Damping;
 	Rigidbody theRigidBody;
 	Renderer myRender;
+	GameObject [] players;
+
 
 	// Use this for initialization
 	void Start () {
 		theRigidBody = GetComponent<Rigidbody> ();
+		 players = GameObject.FindGameObjectsWithTag("Character");
 	//	tr_Player = GameObject.FindGameObjectWithTag ("Character").transform;
 	}
 	
 	// Update is called once per frame
 	void FixedUpdate () {
-		distance = Vector3.Distance (target.position, transform.position);
-		if (distance < lookAtDistance)
+
+		float shortestDist = float.MaxValue;
+		for( int i = 0; i < players.Length; i++ ) {
+			float dist = Vector3.Distance( this.transform.position, players[i].transform.position );
+			if( dist < shortestDist ) {
+				target = players[i].transform;
+				shortestDist = dist;
+			}
+		}
+
+		//distance = Vector3.Distance (target.position, transform.position);
+		if (shortestDist < lookAtDistance)
 		{
 			//Debug.Log("looing at person");
 			lookAt();
 		}
-		if (distance < attackRange)
+		if (shortestDist < attackRange)
 		{
 			attack ();
 		}
