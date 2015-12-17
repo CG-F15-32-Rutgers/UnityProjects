@@ -18,7 +18,7 @@ public class MyBehaviorTree : MonoBehaviour
     public Transform[] accusedPoints;
     public Transform[] roaming;
 
-    private float vote_count;
+    private int vote_count;
     private bool accused_curse;
     private bool accused_ritual;
 
@@ -82,13 +82,11 @@ public class MyBehaviorTree : MonoBehaviour
 	{
 		Val<Vector3> position1 = Val.V(() => location1.position);
 		Val<Vector3> position2 = Val.V(() => location2.position);
-		return new Sequence(
+		return
 			new Sequence(
-            char1.GetComponent<BehaviorMecanim>().Node_GoTo(position1)
-            ),
-			new Sequence(
+            char1.GetComponent<BehaviorMecanim>().Node_GoTo(position1),
             char1.GetComponent<BehaviorMecanim>().Node_OrientTowards(position2)
-            ));
+            );
 	}
 
     protected Node pre_trial()
@@ -161,7 +159,7 @@ public class MyBehaviorTree : MonoBehaviour
 
     protected Node voting()
     {
-        return new SequenceParallel(
+        return new Sequence(
             vote(extras[0]),
             vote(extras[1]),
             vote(extras[2]),
@@ -178,7 +176,7 @@ public class MyBehaviorTree : MonoBehaviour
             vote(extras[13]),
             vote(extras[14]),
             vote(extras[15]),
-            vote(mayor)
+            mayor_vote_true()
             );
     }
 
@@ -193,39 +191,47 @@ public class MyBehaviorTree : MonoBehaviour
 
     protected Node vote_true(GameObject char1)
     {
-        vote_count += 1;
-        if (char1.CompareTag("mayor"))
-        {
-            vote_count += 2;
-        }
-        return new Sequence(char1.GetComponent<BehaviorMecanim>().ST_PlayGesture("Wave", AnimationLayer.Hand, 3000));
+        System.Action vote = () => { vote_count += 1; };
+
+        return
+            new Sequence( new LeafInvoke(vote),
+            char1.GetComponent<BehaviorMecanim>().ST_PlayGesture("Wave", AnimationLayer.Hand, 3000));
     }
 
     protected Node vote_false(GameObject char1)
     {
-        vote_count -= 0.5f;
-        if (char1.CompareTag("mayor"))
-        {
-            vote_count -= 1.5f;
-        }
-        return new Sequence(char1.GetComponent<BehaviorMecanim>().ST_PlayGesture("HeadShake", AnimationLayer.Face, 3000));
+        System.Action vote = () => { vote_count -= 1; };
+
+        return
+            new Sequence( new LeafInvoke(vote),            
+            char1.GetComponent<BehaviorMecanim>().ST_PlayGesture("HeadShake", AnimationLayer.Face, 1000));
     }
+    
+    protected Node mayor_vote_true()
+    {
+        System.Action vote = ()=> { vote_count += 7; };
+        return new Sequence(new LeafInvoke(vote), mayor.GetComponent<BehaviorMecanim>().ST_PlayGesture("Wave", AnimationLayer.Hand, 3000));
+    }
+
+    protected Node mayor_vote_false()
+    {
+        System.Action vote = () => { vote_count -= 7; };
+        return new Sequence(new LeafInvoke(vote), mayor.GetComponent<BehaviorMecanim>().ST_PlayGesture("HeadShake", AnimationLayer.Face, 1000));
+    }
+
     protected Node vote_nuetral(GameObject char1)
     {
-        return new Sequence(char1.GetComponent<BehaviorMecanim>().ST_PlayGesture("Yawn", AnimationLayer.Hand, 3000));
+        return new Sequence(char1.GetComponent<BehaviorMecanim>().ST_PlayGesture("Yawn", AnimationLayer.Hand, 1000));
     }
 
     protected Node decide_execution()
     {
-        if (vote_count > 8)
-        {
-            return new Sequence(commit_execution());
-        }
-        else
-        {
-            return new Sequence(freedom());
-        }
+        System.Func<bool> voted = () => (vote_count > 8);
 
+        return new Selector(
+            new Sequence(new LeafAssert(voted), commit_execution()),
+            new Sequence(freedom())
+            );    
     }
 
     protected Node commit_execution()
@@ -240,16 +246,23 @@ public class MyBehaviorTree : MonoBehaviour
 
     protected Node freedom()
     {
+        System.Action night = () => { this.GetComponent<NightTime>().changeTime(); };
         accused_curse = false;
         return new Sequence(
-            accused.GetComponent<BehaviorMecanim>().ST_PlayGesture("Wave", AnimationLayer.Hand, 2000),
-            ST_ApproachAndWait(accused, accusedPoints[2])
+            accused.GetComponent<BehaviorMecanim>().ST_PlayGesture("Wonderful", AnimationLayer.Hand, 2000),
+            ST_ApproachAndWait(accused, accusedPoints[2]),
+            ST_ApproachAndOrient(accused, accusedPoints[2], accusedPoints[3]),
+            accused.GetComponent<BehaviorMecanim>().ST_PlayGesture("SATNIGHTFEVER", AnimationLayer.Hand, 3000),
+            new LeafInvoke(night)
             );
     }
     protected Node post_execution()
     {
+        System.Action night = () => { this.GetComponent<NightTime>().changeTime(); };
         return new Sequence(
-            ST_ApproachAndOrient(accused, accusedPoints[2], accusedPoints[3])
+            ST_ApproachAndOrient(accused, accusedPoints[2], accusedPoints[3]),
+            accused.GetComponent<BehaviorMecanim>().ST_PlayGesture("SATNIGHTFEVER", AnimationLayer.Hand, 3000),
+            new LeafInvoke(night)
             );
     }
 
