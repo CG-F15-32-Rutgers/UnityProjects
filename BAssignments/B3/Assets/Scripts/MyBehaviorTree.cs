@@ -236,11 +236,16 @@ public class MyBehaviorTree : MonoBehaviour
 
     protected Node commit_execution()
     {
+        System.Action night = () => { this.GetComponent<NightTime>().changeTime(); };
+        System.Action die = () => { accused.SetActive(false); };
         accused_curse = true;
         return new Sequence(
             ST_ApproachAndOrient(executioner, executionerPoints[1], accusedPoints[0]),
             speech(accused),
-            executioner.GetComponent<BehaviorMecanim>().ST_PlayGesture("PISTOLAIM", AnimationLayer.Hand, 3000)
+            executioner.GetComponent<BehaviorMecanim>().ST_PlayGesture("PISTOLAIM", AnimationLayer.Hand, 3000),
+            accused.GetComponent<BehaviorMecanim>().ST_PlayGesture("Dying", AnimationLayer.Hand, 10000),
+            new LeafInvoke(die),
+            new LeafInvoke(night)
             );
     }
 
