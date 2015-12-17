@@ -18,7 +18,9 @@ public class MyBehaviorTree : MonoBehaviour
     public Transform[] accusedPoints;
     public Transform[] roaming;
 
-    private int vote_count;
+    private float vote_count;
+    private bool accused_curse;
+    private bool accused_ritual;
 
     private BehaviorAgent behaviorAgent;
 	// Use this for initialization
@@ -50,18 +52,18 @@ public class MyBehaviorTree : MonoBehaviour
 		return
 			new DecoratorPrintResult(
 				new Sequence(
-                         char1.GetComponent<BehaviorMecanim>().ST_PlayGesture("ACKNOWLEDGE", AnimationLayer.Face, 1000),
-                         char2.GetComponent<BehaviorMecanim>().ST_PlayGesture("Think", AnimationLayer.Face, 1000),
-                         char1.GetComponent<BehaviorMecanim>().ST_PlayGesture("Think", AnimationLayer.Face, 1000),
-                         char2.GetComponent<BehaviorMecanim>().ST_PlayGesture("HeadNod", AnimationLayer.Face, 1000)));
+                         char1.GetComponent<BehaviorMecanim>().ST_PlayGesture("ACKNOWLEDGE", AnimationLayer.Face, 2000),
+                         char2.GetComponent<BehaviorMecanim>().ST_PlayGesture("Think", AnimationLayer.Face, 2000),
+                         char1.GetComponent<BehaviorMecanim>().ST_PlayGesture("Think", AnimationLayer.Face, 2000),
+                         char2.GetComponent<BehaviorMecanim>().ST_PlayGesture("HeadNod", AnimationLayer.Face, 2000)));
 	}
 
     protected Node speech(GameObject char1)
     {
         return new Sequence(
-                         char1.GetComponent<BehaviorMecanim>().ST_PlayGesture("ACKNOWLEDGE", AnimationLayer.Face, 1000),
-                         char1.GetComponent<BehaviorMecanim>().ST_PlayGesture("Think", AnimationLayer.Face, 1000),
-                         char1.GetComponent<BehaviorMecanim>().ST_PlayGesture("HeadNod", AnimationLayer.Face, 1000)
+                         char1.GetComponent<BehaviorMecanim>().ST_PlayGesture("ACKNOWLEDGE", AnimationLayer.Face, 2000),
+                         char1.GetComponent<BehaviorMecanim>().ST_PlayGesture("Think", AnimationLayer.Face, 2000),
+                         char1.GetComponent<BehaviorMecanim>().ST_PlayGesture("HeadNod", AnimationLayer.Face, 2000)
                          );
     }
 
@@ -146,7 +148,7 @@ public class MyBehaviorTree : MonoBehaviour
     protected Node trial()
     {
         return new Sequence(
-            new DecoratorLoop(5, speech(mayor))
+            new DecoratorLoop(3, speech(mayor))
             );
     }
     
@@ -175,7 +177,8 @@ public class MyBehaviorTree : MonoBehaviour
             vote(extras[12]),
             vote(extras[13]),
             vote(extras[14]),
-            vote(extras[15])
+            vote(extras[15]),
+            vote(mayor)
             );
     }
 
@@ -191,12 +194,20 @@ public class MyBehaviorTree : MonoBehaviour
     protected Node vote_true(GameObject char1)
     {
         vote_count += 1;
+        if (char1.CompareTag("mayor"))
+        {
+            vote_count += 2;
+        }
         return new Sequence(char1.GetComponent<BehaviorMecanim>().ST_PlayGesture("Wave", AnimationLayer.Hand, 3000));
     }
 
     protected Node vote_false(GameObject char1)
     {
-        vote_count -= 1;
+        vote_count -= 0.5f;
+        if (char1.CompareTag("mayor"))
+        {
+            vote_count -= 1.5f;
+        }
         return new Sequence(char1.GetComponent<BehaviorMecanim>().ST_PlayGesture("HeadShake", AnimationLayer.Face, 3000));
     }
     protected Node vote_nuetral(GameObject char1)
@@ -219,16 +230,26 @@ public class MyBehaviorTree : MonoBehaviour
 
     protected Node commit_execution()
     {
+        accused_curse = true;
         return new Sequence(
-            ST_ApproachAndOrient(executioner, executionerPoints[1], accusedPoints[0])
+            ST_ApproachAndOrient(executioner, executionerPoints[1], accusedPoints[0]),
+            speech(accused),
+            executioner.GetComponent<BehaviorMecanim>().ST_PlayGesture("PISTOLAIM", AnimationLayer.Hand, 3000)
             );
     }
 
     protected Node freedom()
     {
+        accused_curse = false;
         return new Sequence(
             accused.GetComponent<BehaviorMecanim>().ST_PlayGesture("Wave", AnimationLayer.Hand, 2000),
             ST_ApproachAndWait(accused, accusedPoints[2])
+            );
+    }
+    protected Node post_execution()
+    {
+        return new Sequence(
+            ST_ApproachAndOrient(accused, accusedPoints[2], accusedPoints[3])
             );
     }
 
