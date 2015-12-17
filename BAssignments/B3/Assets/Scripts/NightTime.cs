@@ -8,6 +8,7 @@ public class NightTime : MonoBehaviour {
     public Light sun;
     public ParticleSystem smoke;
     public Light[] lanterns;
+    public Light summon_light;
     public GameObject[] zombies;
 
 	public void changeTime()
@@ -23,6 +24,8 @@ public class NightTime : MonoBehaviour {
         {
             lanterns[i].enabled = true;
         }
+
+        summon_light.enabled = true;
 
         for (int i = 0; i < zombies.Length; ++i)
         {

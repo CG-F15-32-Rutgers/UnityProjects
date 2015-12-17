@@ -117,6 +117,19 @@ public class MyBehaviorTree : MonoBehaviour
             new Sequence(ST_ApproachAndWait(extras[15], roaming[1]))
             );
     }
+    
+    protected Node post_trial_converse()
+    {
+        return new SequenceParallel(
+            new DecoratorLoop(2, Converse(mayor, extras[15])),
+            new DecoratorLoop(2, Converse(extras[0], extras[1])),
+            new DecoratorLoop(2, Converse(extras[3], extras[4])),
+            new DecoratorLoop(2, Converse(extras[5], extras[6])),
+            new DecoratorLoop(2, Converse(extras[7], extras[8])),
+            new DecoratorLoop(2, Converse(extras[10], extras[11])),
+            new DecoratorLoop(2, Converse(extras[12], extras[13]))           
+            );
+    }
 
     protected Node goto_trial()
     {
@@ -209,13 +222,13 @@ public class MyBehaviorTree : MonoBehaviour
     
     protected Node mayor_vote_true()
     {
-        System.Action vote = ()=> { vote_count += 7; };
+        System.Action vote = ()=> { vote_count += 8; };
         return new Sequence(new LeafInvoke(vote), mayor.GetComponent<BehaviorMecanim>().ST_PlayGesture("Wave", AnimationLayer.Hand, 3000));
     }
 
     protected Node mayor_vote_false()
     {
-        System.Action vote = () => { vote_count -= 7; };
+        System.Action vote = () => { vote_count -= 8; };
         return new Sequence(new LeafInvoke(vote), mayor.GetComponent<BehaviorMecanim>().ST_PlayGesture("HeadShake", AnimationLayer.Face, 1000));
     }
 
@@ -243,7 +256,7 @@ public class MyBehaviorTree : MonoBehaviour
             ST_ApproachAndOrient(executioner, executionerPoints[1], accusedPoints[0]),
             speech(accused),
             executioner.GetComponent<BehaviorMecanim>().ST_PlayGesture("PISTOLAIM", AnimationLayer.Hand, 3000),
-            accused.GetComponent<BehaviorMecanim>().ST_PlayGesture("Dying", AnimationLayer.Hand, 10000),
+            accused.GetComponent<BehaviorMecanim>().ST_PlayGesture("Dying", AnimationLayer.Body, 10000),
             new LeafInvoke(die),
             new LeafInvoke(night)
             );
@@ -259,6 +272,13 @@ public class MyBehaviorTree : MonoBehaviour
             ST_ApproachAndOrient(accused, accusedPoints[2], accusedPoints[3]),
             accused.GetComponent<BehaviorMecanim>().ST_PlayGesture("SATNIGHTFEVER", AnimationLayer.Hand, 3000),
             new LeafInvoke(night)
+            );
+    }
+
+    protected Node continuous_ritual()
+    {
+        return new Sequence(
+            accused.GetComponent<BehaviorMecanim>().ST_PlayGesture("SATNIGHTFEVER", AnimationLayer.Hand, 3000)
             );
     }
     protected Node post_execution()
@@ -287,7 +307,7 @@ public class MyBehaviorTree : MonoBehaviour
         vote_count = 0;
         //this.GetComponent<NightTime>().changeTime();
         return new DecoratorLoop(
-            new Sequence(pre_trial(), pre_trial_converse(), goto_trial(), trial(), accused_plee(), voting(), decide_execution())
+            new Sequence(pre_trial(), pre_trial_converse(), goto_trial(), trial(), accused_plee(), voting(), decide_execution(), pre_trial(), post_trial_converse())
                     
             );
 	}
