@@ -183,19 +183,30 @@ public class MyBehaviorTree : MonoBehaviour
     {
         return new SelectorShuffle(
              vote_true(char1),
-              char1.GetComponent<BehaviorMecanim>().ST_PlayGesture("HeadShake", AnimationLayer.Face, 2000)
+             vote_false(char1),
+             vote_nuetral(char1)
             );
     }
 
     protected Node vote_true(GameObject char1)
     {
         vote_count += 1;
-        return new Sequence(char1.GetComponent<BehaviorMecanim>().ST_PlayGesture("Wave", AnimationLayer.Hand, 2000));
+        return new Sequence(char1.GetComponent<BehaviorMecanim>().ST_PlayGesture("Wave", AnimationLayer.Hand, 3000));
+    }
+
+    protected Node vote_false(GameObject char1)
+    {
+        vote_count -= 1;
+        return new Sequence(char1.GetComponent<BehaviorMecanim>().ST_PlayGesture("HeadShake", AnimationLayer.Face, 3000));
+    }
+    protected Node vote_nuetral(GameObject char1)
+    {
+        return new Sequence(char1.GetComponent<BehaviorMecanim>().ST_PlayGesture("Yawn", AnimationLayer.Hand, 3000));
     }
 
     protected Node decide_execution()
     {
-        if (vote_count > 12)
+        if (vote_count > 8)
         {
             return new Sequence(commit_execution());
         }
@@ -216,7 +227,8 @@ public class MyBehaviorTree : MonoBehaviour
     protected Node freedom()
     {
         return new Sequence(
-            ST_ApproachAndWait(accused, accusedPoints[1])
+            accused.GetComponent<BehaviorMecanim>().ST_PlayGesture("Wave", AnimationLayer.Hand, 2000),
+            ST_ApproachAndWait(accused, accusedPoints[2])
             );
     }
 
