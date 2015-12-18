@@ -40,4 +40,14 @@ public class NightTime : MonoBehaviour {
             lanterns[i].enabled = false;
         }
     }
+    
+    public void kill_zombies()
+    {
+        for (int i = 0; i < zombies.Length; ++i)
+        {
+            zombies[i].GetComponent<Animator>().SetBool("back_fall", true);
+            zombies[i].SetActive(false);
+        }
+        summon_light.color = Color.white;
+    }
 }

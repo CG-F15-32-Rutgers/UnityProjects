@@ -10,6 +10,8 @@ public class MyBehaviorTree : MonoBehaviour
     public GameObject accused;
     public GameObject[] extras;
     public GameObject[] zombies;
+    public GameObject movable_crate;
+    public Transform crate_position;
 
     public Transform[] audienceSpots;
     public Transform[] extraPanic;
@@ -189,7 +191,7 @@ public class MyBehaviorTree : MonoBehaviour
             vote(extras[13]),
             vote(extras[14]),
             vote(extras[15]),
-            mayor_vote_true()
+            mayor_vote_false()
             );
     }
 
@@ -251,27 +253,30 @@ public class MyBehaviorTree : MonoBehaviour
     {
         System.Action night = () => { this.GetComponent<NightTime>().changeTime(); };
         System.Action die = () => { accused.SetActive(false); };
-        accused_curse = true;
+        System.Action curse = () => { accused_curse = true; };
+
         return new Sequence(
             ST_ApproachAndOrient(executioner, executionerPoints[1], accusedPoints[0]),
             speech(accused),
             executioner.GetComponent<BehaviorMecanim>().ST_PlayGesture("PISTOLAIM", AnimationLayer.Hand, 3000),
             accused.GetComponent<BehaviorMecanim>().ST_PlayGesture("Dying", AnimationLayer.Body, 10000),
             new LeafInvoke(die),
-            new LeafInvoke(night)
+            new LeafInvoke(night),
+            new LeafInvoke(curse)
             );
     }
 
     protected Node freedom()
     {
         System.Action night = () => { this.GetComponent<NightTime>().changeTime(); };
-        accused_curse = false;
+        System.Action curse = () => { accused_curse = false; };
         return new Sequence(
             accused.GetComponent<BehaviorMecanim>().ST_PlayGesture("Wonderful", AnimationLayer.Hand, 2000),
             ST_ApproachAndWait(accused, accusedPoints[2]),
             ST_ApproachAndOrient(accused, accusedPoints[2], accusedPoints[3]),
             accused.GetComponent<BehaviorMecanim>().ST_PlayGesture("SATNIGHTFEVER", AnimationLayer.Hand, 3000),
-            new LeafInvoke(night)
+            new LeafInvoke(night),
+            new LeafInvoke(curse)
             );
     }
 
@@ -283,11 +288,82 @@ public class MyBehaviorTree : MonoBehaviour
     }
     protected Node post_execution()
     {
-        System.Action night = () => { this.GetComponent<NightTime>().changeTime(); };
-        return new Sequence(
-            ST_ApproachAndOrient(accused, accusedPoints[2], accusedPoints[3]),
-            accused.GetComponent<BehaviorMecanim>().ST_PlayGesture("SATNIGHTFEVER", AnimationLayer.Hand, 3000),
-            new LeafInvoke(night)
+        System.Action runspeed = () => {
+            for (int i = 0; i < extras.Length; ++i)
+            {
+                extras[i].GetComponent<SteeringController>().SlowArrival = false;
+            }
+            mayor.GetComponent<SteeringController>().SlowArrival = false;
+            executioner.GetComponent<SteeringController>().SlowArrival = false;
+        };
+
+        return new Sequence(new LeafInvoke(runspeed), new SequenceParallel(
+            new Sequence(ST_ApproachAndWait(extras[0], extraPanic[0]), panic(extras[0])),
+            new Sequence(ST_ApproachAndWait(extras[1], extraPanic[1]), panic(extras[1])),
+            new Sequence(ST_ApproachAndWait(extras[2], extraPanic[2]), panic(extras[2])),
+            new Sequence(ST_ApproachAndWait(extras[3], extraPanic[3]), panic(extras[3])),
+            new Sequence(ST_ApproachAndWait(extras[4], extraPanic[4]), panic(extras[4])),
+            new Sequence(ST_ApproachAndWait(extras[5], extraPanic[5]), panic(extras[5])),
+            new Sequence(ST_ApproachAndWait(extras[6], extraPanic[6]), panic(extras[6])),
+            new Sequence(ST_ApproachAndWait(extras[7], extraPanic[7]), panic(extras[7])),
+            new Sequence(ST_ApproachAndWait(extras[8], extraPanic[8]), panic(extras[8])),
+            new Sequence(ST_ApproachAndWait(extras[9], extraPanic[9]), panic(extras[9])),
+            new Sequence(ST_ApproachAndWait(extras[10], extraPanic[10]), panic(extras[10])),
+            new Sequence(ST_ApproachAndWait(extras[11], extraPanic[11]), panic(extras[11])),
+            new Sequence(ST_ApproachAndWait(extras[12], extraPanic[12]), panic(extras[12])),
+            new Sequence(ST_ApproachAndWait(extras[13], extraPanic[13]), panic(extras[13])),
+            new Sequence(ST_ApproachAndWait(extras[14], extraPanic[14]), panic(extras[14])),
+            new Sequence(ST_ApproachAndWait(extras[15], extraPanic[15]), panic(extras[15])),
+            protaginist_actions()
+
+            ));
+    }
+
+    protected Node panic(GameObject char1)
+    {
+        return new DecoratorLoop(new Sequence(char1.GetComponent<BehaviorMecanim>().ST_PlayGesture("Duck", AnimationLayer.Body, 3000)));
+    }
+
+    protected Node protaginist_actions()
+    {
+        System.Action move_crate = () => { movable_crate.transform.Translate(crate_position.position - movable_crate.transform.position, Space.World); };
+        System.Func<bool> hope = () => (!accused_curse);
+
+        return new Sequence(new SequenceParallel(ST_ApproachAndOrient(mayor, mayorPoints[2], executionerPoints[3]),
+                                                ST_ApproachAndOrient(executioner, executionerPoints[2], movable_crate.transform)),
+        executioner.GetComponent<BehaviorMecanim>().ST_PlayGesture("STAYAWAY", AnimationLayer.Hand, 3000),
+            new LeafInvoke(move_crate),
+            ST_ApproachAndOrient(executioner, executionerPoints[3], mayorPoints[2]),
+            new DecoratorLoop(3, Converse(mayor, executioner)),
+            new DecoratorForceStatus(RunStatus.Success, new Sequence(new LeafAssert(hope), save_the_day()))
+            );
+    }
+
+    protected Node save_the_day()
+    {
+        System.Action escape_mayor = () => { mayor.GetComponent<BodyMecanim>().NavWarp(mayorPoints[4].position); };
+        System.Action escape_exec = () => { executioner.GetComponent<BodyMecanim>().NavWarp(executionerPoints[5].position); };
+        System.Action kill_zombies = () => { this.GetComponent<NightTime>().kill_zombies(); };
+        System.Action die = () => { accused.SetActive(false); };
+
+        return new Sequence(new SequenceParallel(new Sequence(ST_Approach(mayor, mayorPoints[3]), new LeafInvoke(escape_mayor), ST_Approach(mayor, mayorPoints[5]), ST_Approach(mayor, mayorPoints[6]), 
+                                                              ST_ApproachAndOrient(mayor, mayorPoints[7], accused.transform) ),
+                                                 new Sequence(new LeafWait(2000), ST_Approach(executioner, executionerPoints[4]), new LeafInvoke(escape_exec), ST_Approach(executioner, executionerPoints[6]), 
+                                                              ST_Approach(executioner, executionerPoints[7]), ST_ApproachAndOrient(executioner, executionerPoints[8], accused.transform))
+                                                ),
+                            mayor.GetComponent<BehaviorMecanim>().ST_PlayGesture("pointing", AnimationLayer.Hand, 3000),
+                            ST_Orient(accused, mayor),
+                            new DecoratorLoop(2, speech(mayor)),
+                            new DecoratorLoop(2, speech(accused)),
+                            speech(mayor),
+                            executioner.GetComponent<BehaviorMecanim>().ST_PlayGesture("PISTOLAIM", AnimationLayer.Hand, 3000),
+                            accused.GetComponent<BehaviorMecanim>().ST_PlayGesture("Dying", AnimationLayer.Body, 10000),
+                            new LeafInvoke(die),
+                            new LeafInvoke(kill_zombies),
+                            new SequenceParallel(executioner.GetComponent<BehaviorMecanim>().ST_PlayGesture("Cheer", AnimationLayer.Hand, 3000), 
+                                                 mayor.GetComponent<BehaviorMecanim>().ST_PlayGesture("Cheer", AnimationLayer.Hand, 3000))
+
+
             );
     }
 
@@ -296,19 +372,20 @@ public class MyBehaviorTree : MonoBehaviour
         Val<Vector3> position = Val.V(() => target.position);
         return new Sequence(character.GetComponent<BehaviorMecanim>().Node_GoTo(position), new LeafWait(1000));
     }
-    /*protected Node ST_Approach(int playerNum, Transform target)
+    protected Node ST_Approach(GameObject char1, Transform target)
     {
         Val<Vector3> position = Val.V(() => target.position);
-        return new Sequence(participants[playerNum].GetComponent<BehaviorMecanim>().Node_GoTo(position));
-    }*/
+        return new Sequence(char1.GetComponent<BehaviorMecanim>().Node_GoTo(position));
+    }
 
     protected Node BuildTreeRoot()
 	{
+        System.Func<bool> curse = () => (accused_curse);
         vote_count = 0;
         //this.GetComponent<NightTime>().changeTime();
         return new DecoratorLoop(
-            new Sequence(pre_trial(), pre_trial_converse(), goto_trial(), trial(), accused_plee(), voting(), decide_execution(), pre_trial(), post_trial_converse())
+            new Sequence(pre_trial(), pre_trial_converse(), goto_trial(), trial(), accused_plee(), voting(), decide_execution(), pre_trial(), post_trial_converse(), post_execution()
                     
-            );
+            ));
 	}
 }

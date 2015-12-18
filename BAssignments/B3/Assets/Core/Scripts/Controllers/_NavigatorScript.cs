@@ -96,7 +96,7 @@ public class _NavigatorScript : MonoBehaviour
                 animator.SetBool("F_FireBreath", false);
             }
         }
- 
+         
 	}
 
     void OnCollisionEnter(Collision col)

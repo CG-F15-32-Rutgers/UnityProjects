@@ -40,7 +40,7 @@ namespace CompleteProject
             {
                 if (Physics.Raycast(ray, out hit, 100))
                 {
-                    if (hit.collider.CompareTag("Character") || hit.collider.CompareTag("mayor"))
+                    if (hit.collider.CompareTag("Character") || hit.collider.CompareTag("mayor") || hit.collider.CompareTag("necromancer"))
                     {
                         CharacterClicked = true;
                         obstacleClicked = false;
