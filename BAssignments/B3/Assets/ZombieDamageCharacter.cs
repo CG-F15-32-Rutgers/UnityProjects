@@ -3,7 +3,7 @@ using System.Collections;
 
 public class ZombieDamageCharacter : MonoBehaviour {
 
-	public int health = 100;
+	public double health = 150;
 
 
 	// Use this for initialization
@@ -14,15 +14,15 @@ public class ZombieDamageCharacter : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		Debug.Log(health + "hp left");
-		if(health == 0){
-			Destroy(this);
+		if(health < 0){
+			gameObject.SetActive(false);
 		}
 	}
 
-	void OnTriggerEnter(Collider col){
+	void OnTriggerStay(Collider col){
 		Debug.Log("colliding");
 		if(col.gameObject.tag == "Zombie"){
-			health-=5;
+			health-=1;
 		}
 	}
 }
