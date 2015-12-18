@@ -191,7 +191,7 @@ public class MyBehaviorTree : MonoBehaviour
             vote(extras[13]),
             vote(extras[14]),
             vote(extras[15]),
-            mayor_vote_false()
+            mayor_vote_true()
             );
     }
 
