@@ -19,7 +19,7 @@ public class ZombieDamageCharacter : MonoBehaviour {
 		}
 	}
 
-	void OnCollisionEnter(Collision col){
+	void OnTriggerEnter(Collider col){
 		Debug.Log("colliding");
 		if(col.gameObject.tag == "Zombie"){
 			health-=5;
