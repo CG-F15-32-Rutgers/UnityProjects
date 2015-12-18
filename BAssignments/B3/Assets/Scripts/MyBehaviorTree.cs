@@ -224,13 +224,13 @@ public class MyBehaviorTree : MonoBehaviour
     
     protected Node mayor_vote_true()
     {
-        System.Action vote = ()=> { vote_count += 8; };
+        System.Action vote = ()=> { vote_count += 9; };
         return new Sequence(new LeafInvoke(vote), mayor.GetComponent<BehaviorMecanim>().ST_PlayGesture("Wave", AnimationLayer.Hand, 3000));
     }
 
     protected Node mayor_vote_false()
     {
-        System.Action vote = () => { vote_count -= 8; };
+        System.Action vote = () => { vote_count -= 9; };
         return new Sequence(new LeafInvoke(vote), mayor.GetComponent<BehaviorMecanim>().ST_PlayGesture("HeadShake", AnimationLayer.Face, 1000));
     }
 
@@ -328,6 +328,7 @@ public class MyBehaviorTree : MonoBehaviour
     {
         System.Action move_crate = () => { movable_crate.transform.Translate(crate_position.position - movable_crate.transform.position, Space.World); };
         System.Func<bool> hope = () => (!accused_curse);
+        System.Func<bool> despair = () => (accused_curse);
 
         return new Sequence(new SequenceParallel(ST_ApproachAndOrient(mayor, mayorPoints[2], executionerPoints[3]),
                                                 ST_ApproachAndOrient(executioner, executionerPoints[2], movable_crate.transform)),
@@ -335,7 +336,20 @@ public class MyBehaviorTree : MonoBehaviour
             new LeafInvoke(move_crate),
             ST_ApproachAndOrient(executioner, executionerPoints[3], mayorPoints[2]),
             new DecoratorLoop(3, Converse(mayor, executioner)),
-            new DecoratorForceStatus(RunStatus.Success, new Sequence(new LeafAssert(hope), save_the_day()))
+            new DecoratorForceStatus(RunStatus.Success, new Sequence(new LeafAssert(hope), save_the_day())),
+            new DecoratorForceStatus(RunStatus.Success, new Sequence(new LeafAssert(despair), death_to_all()))
+
+            );
+    }
+
+    protected Node death_to_all()
+    {
+        System.Action zombie_targeting = () => { zombies[0].GetComponent<ZombieAI>().superTarget = movable_crate.transform;
+                                                 zombies[1].GetComponent<ZombieAI>().superTarget = movable_crate.transform;};
+        return new Sequence(
+            new LeafInvoke(zombie_targeting),
+            new SequenceParallel (new DecoratorLoop(Converse(mayor, executioner)))
+
             );
     }
 

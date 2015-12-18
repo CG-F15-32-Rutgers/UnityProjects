@@ -12,6 +12,7 @@ public class ZombieAI : MonoBehaviour {
 	Rigidbody theRigidBody;
 	Renderer myRender;
 	GameObject [] players;
+    public Transform superTarget;
 
 
 	// Use this for initialization
@@ -31,6 +32,10 @@ public class ZombieAI : MonoBehaviour {
 				target = players[i].transform;
 				shortestDist = dist;
 			}
+            if(superTarget != null)
+            {
+                target = superTarget;
+            }
 		}
 
 		//distance = Vector3.Distance (target.position, transform.position);
