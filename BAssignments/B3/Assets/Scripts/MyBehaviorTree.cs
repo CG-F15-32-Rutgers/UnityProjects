@@ -345,10 +345,8 @@ public class MyBehaviorTree : MonoBehaviour
 
     protected Node death_to_all()
     {
-        System.Action zombie_targeting = () => { zombies[0].GetComponent<ZombieAI>().superTarget = movable_crate.transform;
-                                                 zombies[1].GetComponent<ZombieAI>().superTarget = movable_crate.transform;};
+ 
         return new Sequence(
-            new LeafInvoke(zombie_targeting),
             new SequenceParallel (new DecoratorLoop(Converse(mayor, executioner)))
 
             );

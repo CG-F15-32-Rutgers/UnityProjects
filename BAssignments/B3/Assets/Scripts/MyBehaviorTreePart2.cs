@@ -153,8 +153,8 @@ public class MyBehaviorTreePart2 : MonoBehaviour
             ST_ApproachAndOrient(extras[13], audienceSpots[13], mayorPoints[0]),
             ST_ApproachAndOrient(extras[14], audienceSpots[14], mayorPoints[0]),
             ST_ApproachAndOrient(extras[15], audienceSpots[15], mayorPoints[0]),
-            ST_ApproachAndOrient(accused, accusedPoints[0], audienceSpots[2]),
-            ST_ApproachAndOrient(executioner, executionerPoints[0], accusedPoints[0])
+            ST_ApproachAndOrient(accused, accusedPoints[0], audienceSpots[2])
+            //ST_ApproachAndOrient(executioner, executionerPoints[0], accusedPoints[0])
             ));
     }
 
@@ -256,9 +256,9 @@ public class MyBehaviorTreePart2 : MonoBehaviour
         System.Action curse = () => { accused_curse = true; };
 
         return new Sequence(
-            ST_ApproachAndOrient(executioner, executionerPoints[1], accusedPoints[0]),
+            //ST_ApproachAndOrient(executioner, executionerPoints[1], accusedPoints[0]),
             speech(accused),
-            executioner.GetComponent<BehaviorMecanim>().ST_PlayGesture("PISTOLAIM", AnimationLayer.Hand, 3000),
+            //executioner.GetComponent<BehaviorMecanim>().ST_PlayGesture("PISTOLAIM", AnimationLayer.Hand, 3000),
             accused.GetComponent<BehaviorMecanim>().ST_PlayGesture("Dying", AnimationLayer.Body, 10000),
             new LeafInvoke(die),
             new LeafInvoke(night),
@@ -294,7 +294,7 @@ public class MyBehaviorTreePart2 : MonoBehaviour
                 extras[i].GetComponent<Animator>().SetFloat("Speed", 10);
             }
             mayor.GetComponent<Animator>().SetFloat("Speed", 10);
-            executioner.GetComponent<Animator>().SetFloat("Speed", 10);
+            //executioner.GetComponent<Animator>().SetFloat("Speed", 10);
         };
 
         return new Sequence(new LeafInvoke(runspeed), new SequenceParallel(
@@ -321,7 +321,8 @@ public class MyBehaviorTreePart2 : MonoBehaviour
 
     protected Node panic(GameObject char1)
     {
-        return new DecoratorLoop(new Sequence(char1.GetComponent<BehaviorMecanim>().ST_PlayGesture("Duck", AnimationLayer.Body, 3000)));
+        System.Func<bool> alive = () => (char1.active);
+        return new Sequence(new LeafAssert(alive), char1.GetComponent<BehaviorMecanim>().ST_PlayGesture("Duck", AnimationLayer.Body, 3000));
     }
 
     protected Node protaginist_actions()
@@ -330,12 +331,13 @@ public class MyBehaviorTreePart2 : MonoBehaviour
         System.Func<bool> hope = () => (!accused_curse);
         System.Func<bool> despair = () => (accused_curse);
 
-        return new Sequence(new SequenceParallel(ST_ApproachAndOrient(mayor, mayorPoints[2], executionerPoints[3]),
-                                                ST_ApproachAndOrient(executioner, executionerPoints[2], movable_crate.transform)),
-        executioner.GetComponent<BehaviorMecanim>().ST_PlayGesture("STAYAWAY", AnimationLayer.Hand, 3000),
-            new LeafInvoke(move_crate),
-            ST_ApproachAndOrient(executioner, executionerPoints[3], mayorPoints[2]),
-            new DecoratorLoop(3, Converse(mayor, executioner)),
+        return new Sequence(new SequenceParallel(ST_ApproachAndOrient(mayor, mayorPoints[2], executionerPoints[3])
+                                                //ST_ApproachAndOrient(executioner, executionerPoints[2], movable_crate.transform)
+                                                ),
+        //executioner.GetComponent<BehaviorMecanim>().ST_PlayGesture("STAYAWAY", AnimationLayer.Hand, 3000),
+            //new LeafInvoke(move_crate),
+            //ST_ApproachAndOrient(executioner, executionerPoints[3], mayorPoints[2]),
+            new DecoratorLoop(3, speech(mayor)),
             new DecoratorForceStatus(RunStatus.Success, new Sequence(new LeafAssert(hope), save_the_day())),
             new DecoratorForceStatus(RunStatus.Success, new Sequence(new LeafAssert(despair), death_to_all()))
 
@@ -344,11 +346,9 @@ public class MyBehaviorTreePart2 : MonoBehaviour
 
     protected Node death_to_all()
     {
-        System.Action zombie_targeting = () => { zombies[0].GetComponent<ZombieAI>().superTarget = movable_crate.transform;
-                                                 zombies[1].GetComponent<ZombieAI>().superTarget = movable_crate.transform;};
+        
         return new Sequence(
-            new LeafInvoke(zombie_targeting),
-            new SequenceParallel (new DecoratorLoop(Converse(mayor, executioner)))
+            new SequenceParallel (new DecoratorLoop(speech(mayor)))
 
             );
     }
@@ -361,20 +361,20 @@ public class MyBehaviorTreePart2 : MonoBehaviour
         System.Action die = () => { accused.SetActive(false); };
 
         return new Sequence(new SequenceParallel(new Sequence(ST_Approach(mayor, mayorPoints[3]), new LeafInvoke(escape_mayor), ST_Approach(mayor, mayorPoints[5]), ST_Approach(mayor, mayorPoints[6]), 
-                                                              ST_ApproachAndOrient(mayor, mayorPoints[7], accused.transform) ),
-                                                 new Sequence(new LeafWait(2000), ST_Approach(executioner, executionerPoints[4]), new LeafInvoke(escape_exec), ST_Approach(executioner, executionerPoints[6]), 
-                                                              ST_Approach(executioner, executionerPoints[7]), ST_ApproachAndOrient(executioner, executionerPoints[8], accused.transform))
+                                                              ST_ApproachAndOrient(mayor, mayorPoints[7], accused.transform) )
+                                                 //new Sequence(new LeafWait(2000), ST_Approach(executioner, executionerPoints[4]), new LeafInvoke(escape_exec), ST_Approach(executioner, executionerPoints[6]), 
+                                                              //ST_Approach(executioner, executionerPoints[7]), ST_ApproachAndOrient(executioner, executionerPoints[8], accused.transform))
                                                 ),
                             mayor.GetComponent<BehaviorMecanim>().ST_PlayGesture("pointing", AnimationLayer.Hand, 3000),
                             ST_Orient(accused, mayor),
                             new DecoratorLoop(2, speech(mayor)),
                             new DecoratorLoop(2, speech(accused)),
                             speech(mayor),
-                            executioner.GetComponent<BehaviorMecanim>().ST_PlayGesture("PISTOLAIM", AnimationLayer.Hand, 3000),
+                            //executioner.GetComponent<BehaviorMecanim>().ST_PlayGesture("PISTOLAIM", AnimationLayer.Hand, 3000),
                             accused.GetComponent<BehaviorMecanim>().ST_PlayGesture("Dying", AnimationLayer.Body, 10000),
                             new LeafInvoke(die),
                             new LeafInvoke(kill_zombies),
-                            new SequenceParallel(executioner.GetComponent<BehaviorMecanim>().ST_PlayGesture("Cheer", AnimationLayer.Hand, 3000), 
+                            new SequenceParallel(//executioner.GetComponent<BehaviorMecanim>().ST_PlayGesture("Cheer", AnimationLayer.Hand, 3000), 
                                                  mayor.GetComponent<BehaviorMecanim>().ST_PlayGesture("Cheer", AnimationLayer.Hand, 3000))
 
 

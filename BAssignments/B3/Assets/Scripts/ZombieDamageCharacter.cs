@@ -18,11 +18,4 @@ public class ZombieDamageCharacter : MonoBehaviour {
 			gameObject.SetActive(false);
 		}
 	}
-
-	/*void OnTriggerStay(Collider col){
-		Debug.Log("colliding");
-		if(col.gameObject.tag == "Zombie"){
-			health-=1;
-		}
-	}*/
 }

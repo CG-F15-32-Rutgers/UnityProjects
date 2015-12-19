@@ -9,24 +9,24 @@ public class KyleControlScript : MonoBehaviour
     public float tick;
     public UnityEngine.UI.Text hint;
 
-    private Animator anim; // a reference to the animator on the character
+    private Animator anim; 
     private GameObject dismissableNPC;
 
     void Start()
     {
-        // initialising reference variables
+        
         anim = GetComponent<Animator>();
-        if (anim.layerCount == 2)
+        if (anim.layerCount == 3)
         {
             anim.SetLayerWeight(1, 1);
+            anim.SetLayerWeight(2, 1);
         }
         tick = 0;
     }
-
-    // Update is called once per frame
+    
     void Update()
     {
-        // Script from our B1 modified VERY slightly for this assignment (no jump / fall)
+       
         float h = Input.GetAxis("Horizontal");
         float v = Input.GetAxis("Vertical");
 
@@ -56,28 +56,11 @@ public class KyleControlScript : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            anim.SetBool("H_PistolAim", true);
+            //anim.laye(1, 1);
+            anim.Play("PistolAim");
+            //anim.SetLayerWeight(1, 1);
         }
 
     }
-
-    /*void OnTriggerEnter(Collider other)
-    {
-        if (other.gameObject.CompareTag("Shopper") || other.gameObject.CompareTag("Thief"))
-        {
-            dismissableNPC = other.gameObject;
-            hint.gameObject.SetActive(true);
-        }
-    }
-
-    void OnTriggerExit(Collider other)
-    {
-        if (other.gameObject.Equals(dismissableNPC))
-        {
-            dismissableNPC = null;
-            hint.gameObject.SetActive(false);
-        }
-    }*/
-
 
 }
