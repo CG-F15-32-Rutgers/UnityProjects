@@ -3,7 +3,7 @@ using System.Collections;
 using TreeSharpPlus;
 using RootMotion.FinalIK;
 
-public class MyBehaviorTree : MonoBehaviour
+public class MyBehaviorTreePart2 : MonoBehaviour
 {
     public GameObject mayor;
     public GameObject executioner;

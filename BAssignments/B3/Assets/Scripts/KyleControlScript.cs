@@ -42,27 +42,26 @@ public class KyleControlScript : MonoBehaviour
 
         if (v != 0)
         {
-            Quaternion rotation = Quaternion.Euler(new Vector3(0, h * 20, 0));
+            Quaternion rotation = Quaternion.Euler(new Vector3(0, h * 2, 0));
             transform.rotation = transform.rotation * rotation;
         }
         else if (v == 0)
         {
-            h = h * 75;
+            h = h * 20;
         }
 
         anim.SetFloat("Speed", v);
         anim.SetFloat("Direction", h);
         anim.speed = animSpeed;
 
-        /*if (Input.GetKeyDown(KeyCode.Space) && dismissableNPC != null)
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            GetComponent<SpeechBubbleController>().DisplaySpeechBubble("Sir, I'm going to have to ask you to leave.");
-            dismissableNPC.GetComponent<ShopperMeta>().StillActive = false;
-        }*/
+            anim.SetBool("H_PistolAim", true);
+        }
 
     }
 
-    void OnTriggerEnter(Collider other)
+    /*void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("Shopper") || other.gameObject.CompareTag("Thief"))
         {
@@ -78,7 +77,7 @@ public class KyleControlScript : MonoBehaviour
             dismissableNPC = null;
             hint.gameObject.SetActive(false);
         }
-    }
+    }*/
 
 
 }
