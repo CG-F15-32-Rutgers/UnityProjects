@@ -2,6 +2,8 @@
 using System.Collections;
 
 public class ZombieAI : MonoBehaviour {
+	Animator ZombieAnim;
+	int attackAnim = Animator.StringToHash("Attack");
 	private Transform target;
 	private float distance;
 	public float lookAtDistance;
@@ -16,8 +18,8 @@ public class ZombieAI : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		ZombieAnim = GetComponent<Animator>();
 		theRigidBody = GetComponent<Rigidbody> ();
-	//	tr_Player = GameObject.FindGameObjectWithTag ("Character").transform;
 	}
 	
 	// Update is called once per frame
@@ -48,7 +50,11 @@ public class ZombieAI : MonoBehaviour {
 		}
 		if (shortestDist < attackRange)
 		{
-			attack ();
+			chase ();
+			if(shortestDist < 2){
+				ZombieAnim.SetTrigger(attackAnim);
+				ZombieAnim.Play("Attack");
+			}
 		}
 	}
 	void lookAt ()
@@ -57,7 +63,7 @@ public class ZombieAI : MonoBehaviour {
 		transform.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * Damping);
 	}
 	
-	void attack ()
+	void chase ()
 	{
 		//Debug.Log("moving toward person");
         //theRigidBody.AddForce (transform.forward * moveSpeed);
