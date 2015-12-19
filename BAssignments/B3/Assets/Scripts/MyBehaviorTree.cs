@@ -297,7 +297,7 @@ public class MyBehaviorTree : MonoBehaviour
             executioner.GetComponent<Animator>().SetFloat("Speed", 10);
         };
 
-        return new Sequence(new LeafInvoke(runspeed), new SequenceParallel(
+        return new Sequence(new LeafInvoke(runspeed), new DecoratorForceStatus(RunStatus.Success, new SequenceParallel(
             new Sequence(ST_ApproachAndWait(extras[0], extraPanic[0]), panic(extras[0])),
             new Sequence(ST_ApproachAndWait(extras[1], extraPanic[1]), panic(extras[1])),
             new Sequence(ST_ApproachAndWait(extras[2], extraPanic[2]), panic(extras[2])),
@@ -316,12 +316,13 @@ public class MyBehaviorTree : MonoBehaviour
             new Sequence(ST_ApproachAndWait(extras[15], extraPanic[15]), panic(extras[15])),
             protaginist_actions()
 
-            ));
+            )));
     }
 
     protected Node panic(GameObject char1)
     {
-        return new DecoratorLoop(new Sequence(char1.GetComponent<BehaviorMecanim>().ST_PlayGesture("Duck", AnimationLayer.Body, 3000)));
+        System.Func<bool> alive = () => (char1.active);
+        return new Sequence( new LeafAssert(alive), char1.GetComponent<BehaviorMecanim>().ST_PlayGesture("Duck", AnimationLayer.Body, 3000));
     }
 
     protected Node protaginist_actions()

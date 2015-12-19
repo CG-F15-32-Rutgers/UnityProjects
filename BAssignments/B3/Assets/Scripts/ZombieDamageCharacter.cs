@@ -13,16 +13,16 @@ public class ZombieDamageCharacter : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		Debug.Log(health + "hp left");
+		//Debug.Log(health + "hp left");
 		if(health < 0){
 			gameObject.SetActive(false);
 		}
 	}
 
-	void OnTriggerStay(Collider col){
+	/*void OnTriggerStay(Collider col){
 		Debug.Log("colliding");
 		if(col.gameObject.tag == "Zombie"){
 			health-=1;
 		}
-	}
+	}*/
 }
